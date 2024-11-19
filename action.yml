@@ -1,0 +1,10 @@
+name: 'Setup Acton'
+description: 'Installs the Acton programming language'
+inputs:
+  channel:
+    description: 'Which Acton version to install: stable or tip'
+    required: false
+    default: 'stable'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
