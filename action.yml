@@ -5,6 +5,9 @@ inputs:
     description: 'Which Acton version to install: stable or tip'
     required: false
     default: 'stable'
+outputs:
+  version:
+    description: 'The version of Acton that was installed'
 runs:
   using: 'node20'
   main: 'dist/index.js'

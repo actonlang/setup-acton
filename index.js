@@ -31,7 +31,13 @@ async function run() {
     await exec.exec('sudo', ['apt-get', 'install', '-qy', 'acton']);
 
     // Verify Acton installation
-    await exec.exec('acton', ['version']);
+    // Verify Acton installation and get version
+    const versionOutput = await exec.getExecOutput('actonc', ['--numeric-version']);
+    if (versionOutput.exitCode !== 0) {
+      throw new Error(`Failed to get Acton version. Exit code: ${versionOutput.exitCode} - ${versionOutput.stderr}`);
+    }
+    const version = versionOutput.stdout.trim();
+    core.setOutput('version', version);
 
   } catch (error) {
     core.setFailed(error.message);
