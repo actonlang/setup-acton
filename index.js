@@ -32,7 +32,7 @@ async function run() {
 
     // Verify Acton installation
     // Verify Acton installation and get version
-    const versionOutput = await exec.getExecOutput('actonc', ['--numeric-version']);
+    const versionOutput = await exec.getExecOutput('acton', ['version']);
     if (versionOutput.exitCode !== 0) {
       throw new Error(`Failed to get Acton version. Exit code: ${versionOutput.exitCode} - ${versionOutput.stderr}`);
     }
