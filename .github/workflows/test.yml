@@ -1,0 +1,52 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm run build
+      - name: Check dist is up to date
+        run: |
+          if ! git diff --exit-code -- dist; then
+            echo "::error::dist/ is out of date, run 'npm run build' and commit the result"
+            exit 1
+          fi
+
+  smoke-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+        channel: [stable, tip]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Acton
+        id: setup
+        uses: ./
+        with:
+          channel: ${{ matrix.channel }}
+
+      - name: Check version output matches installed package
+        run: |
+          expected=$(dpkg-query -W -f='${Version}' acton)
+          echo "Action output:   '$VERSION'"
+          echo "Package version: '$expected'"
+          if [ -z "$VERSION" ] || [ "$VERSION" != "$expected" ]; then
+            echo "::error::version output '$VERSION' does not match installed acton package ($expected)"
+            exit 1
+          fi
+        env:
+          VERSION: ${{ steps.setup.outputs.version }}
